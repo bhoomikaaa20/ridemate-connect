@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth"; // ✅ IMPORTANT
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,19 +12,45 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+  const { refreshUser } = useAuth(); // ✅ FIX
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const res = await fetch("http://localhost:5000/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, password }),
-    });
-    toast.success("Welcome back!");
-    navigate("/");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      setLoading(false);
+
+      if (!res.ok) {
+        toast.error(data.message || "Login failed");
+        return;
+      }
+
+      // 🔥 IMPORTANT: update auth state
+      await refreshUser();
+
+      toast.success("Welcome back!");
+
+      // 👉 Redirect based on role
+      if (data.user.role === "admin") navigate("/admin");
+      else if (data.user.role === "rider") navigate("/rider");
+      else navigate("/dashboard");
+
+    } catch (err) {
+      setLoading(false);
+      toast.error("Something went wrong");
+    }
   };
 
   return (
@@ -35,34 +62,34 @@ export default function Login() {
           <p className="text-sm text-muted-foreground mb-6">
             Login to access your dashboard.
           </p>
+
           <form onSubmit={submit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label>Email</Label>
               <Input
-                id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
               />
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label>Password</Label>
               <Input
-                id="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
               />
             </div>
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Signing in..." : "Login"}
             </Button>
           </form>
-          <p className="text-sm text-muted-foreground text-center mt-6">
+
+          <p className="text-sm text-center mt-6">
             No account?{" "}
             <Link to="/signup" className="text-primary font-medium">
               Sign up
