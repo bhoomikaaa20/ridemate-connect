@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { StatusBadge } from "@/components/StatusBadge";
 
 interface Ride {
-  id: string;
+  _id: string;
   pickup: string;
   drop_location: string;
   status: string;
@@ -105,11 +105,11 @@ export default function RiderDashboard() {
                 </TableRow>
               )}
               {available.map((r) => (
-                <TableRow key={r.id}>
+                <TableRow key={r._id}>
                   <TableCell>{r.pickup}</TableCell>
                   <TableCell>{r.drop_location}</TableCell>
                   <TableCell className="text-right">
-                    <Button size="sm" onClick={() => accept(r.id)}>
+                    <Button size="sm" onClick={() => accept(r._id)}>
                       Accept
                     </Button>
                   </TableCell>
@@ -141,7 +141,7 @@ export default function RiderDashboard() {
                 </TableRow>
               )}
               {mine.map((r) => (
-                <TableRow key={r.id}>
+                <TableRow key={r._id}>
                   <TableCell>{r.pickup}</TableCell>
                   <TableCell>{r.drop_location}</TableCell>
                   <TableCell>
@@ -149,7 +149,7 @@ export default function RiderDashboard() {
                   </TableCell>
                   <TableCell className="text-right">
                     {r.status === "accepted" && (
-                      <Button size="sm" variant="outline" onClick={() => complete(r.id)}>
+                      <Button size="sm" variant="outline" onClick={() => complete(r._id)}>
                         Mark completed
                       </Button>
                     )}

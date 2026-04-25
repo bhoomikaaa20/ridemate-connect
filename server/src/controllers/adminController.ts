@@ -2,37 +2,56 @@ import { Request, Response } from "express";
 import User from "../models/User";
 import Ride from "../models/Ride";
 
-// GET all users
+// 🔹 GET all users
 export const getUsers = async (_req: Request, res: Response) => {
-    const users = await User.find();
-    res.json(users);
+    try {
+        const users = await User.find().select("-password"); // hide password
+        res.json(users);
+    } catch {
+        res.status(500).json({ message: "Error fetching users" });
+    }
 };
 
-// DELETE user
+// 🔹 DELETE user
 export const deleteUser = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    try {
+        const { id } = req.params;
 
-    await User.findByIdAndDelete(id);
-    await Ride.deleteMany({ user: id });
+        await User.findByIdAndDelete(id);
 
-    res.json({ message: "User deleted" });
+        // ✅ FIXED: correct field name
+        await Ride.deleteMany({ user_id: id });
+
+        res.json({ message: "User deleted" });
+    } catch {
+        res.status(500).json({ message: "Error deleting user" });
+    }
 };
 
-// GET all rides
+// 🔹 GET all rides
 export const getRides = async (_req: Request, res: Response) => {
-    const rides = await Ride.find()
-        .populate("user", "name email")
-        .populate("rider", "name email")
-        .sort({ createdAt: -1 });
+    try {
+        const rides = await Ride.find()
+            // ✅ FIXED: correct field names
+            .populate("user_id", "name email")
+            .populate("rider_id", "name email")
+            .sort({ createdAt: -1 });
 
-    res.json(rides);
+        res.json(rides);
+    } catch {
+        res.status(500).json({ message: "Error fetching rides" });
+    }
 };
 
-// DELETE ride
+// 🔹 DELETE ride
 export const deleteRide = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    try {
+        const { id } = req.params;
 
-    await Ride.findByIdAndDelete(id);
+        await Ride.findByIdAndDelete(id);
 
-    res.json({ message: "Ride deleted" });
+        res.json({ message: "Ride deleted" });
+    } catch {
+        res.status(500).json({ message: "Error deleting ride" });
+    }
 };

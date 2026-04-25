@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { StatusBadge } from "@/components/StatusBadge";
 
 interface Ride {
-  id: string;
+  _id: string;
   pickup: string;
   drop_location: string;
   status: string;
@@ -149,7 +149,7 @@ export default function UserDashboard() {
                 </TableRow>
               )}
               {rides.map((r) => (
-                <TableRow key={r.id}>
+                <TableRow key={r._id}>
                   <TableCell>{r.pickup}</TableCell>
                   <TableCell>{r.drop_location}</TableCell>
                   <TableCell>
@@ -160,7 +160,7 @@ export default function UserDashboard() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => cancel(r.id)}
+                        onClick={() => cancel(r._id)}
                       >
                         Cancel
                       </Button>

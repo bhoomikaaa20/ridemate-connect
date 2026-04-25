@@ -20,16 +20,17 @@ import { toast } from "sonner";
 import { StatusBadge } from "@/components/StatusBadge";
 
 interface Profile {
-  id: string;
+  _id: string;
   name: string;
   email: string;
+  role: string;
 }
 interface RoleRow {
   user_id: string;
   role: string;
 }
 interface Ride {
-  id: string;
+  _id: string;
   pickup: string;
   drop_location: string;
   status: string;
@@ -70,7 +71,7 @@ export default function AdminDashboard() {
   }, []);
 
   const roleOf = (uid: string) => {
-    const user = profiles.find((p) => p.id === uid);
+    const user = profiles.find((p) => p._id === uid);
     return (user as any)?.role || "user";
   };
   const nameOf = (user: any) => {
@@ -104,8 +105,8 @@ export default function AdminDashboard() {
     }
   };
 
-  const usersList = profiles.filter((p) => roleOf(p.id) === "user");
-  const ridersList = profiles.filter((p) => roleOf(p.id) === "rider");
+  const usersList = profiles.filter((p) => roleOf(p._id) === "user");
+  const ridersList = profiles.filter((p) => roleOf(p._id) === "rider");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -157,7 +158,7 @@ export default function AdminDashboard() {
                     </TableRow>
                   )}
                   {rides.map((r) => (
-                    <TableRow key={r.id}>
+                    <TableRow key={r._id}>
                       <TableCell>{nameOf(r.user_id)}</TableCell>
                       <TableCell>{nameOf(r.rider_id)}</TableCell>
                       <TableCell>{r.pickup}</TableCell>
@@ -169,7 +170,7 @@ export default function AdminDashboard() {
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => deleteRide(r.id)}
+                          onClick={() => deleteRide(r._id)}
                         >
                           Delete
                         </Button>
@@ -211,14 +212,14 @@ function PeopleTable({
           </TableRow>
         )}
         {list.map((p) => (
-          <TableRow key={p.id}>
+          <TableRow key={p._id}>
             <TableCell>{p.name || "—"}</TableCell>
             <TableCell>{p.email}</TableCell>
             <TableCell className="text-right">
               <Button
                 size="sm"
                 variant="destructive"
-                onClick={() => onDelete(p.id)}
+                onClick={() => onDelete(p._id)}
               >
                 Delete
               </Button>
